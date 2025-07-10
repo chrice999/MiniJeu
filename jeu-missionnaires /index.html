@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu : Missionnaires et Cannibales</title>
+    <style>
+        :root {
+            --river-blue: #4a7b9d;
+            --sky-blue: #87ceeb;
+            --bank-green: #d4a373;
+            --button-color: #a67c52;
+            --button-hover: #8c6744;
+            --font-family: 'Georgia', serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #fefae0;
+            color: #283618;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 1rem 0;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 1rem;
+            border-radius: 0.75rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin: 0;
+        }
+        
+        .game-world {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            min-height: 450px;
+            background: linear-gradient(to top, var(--river-blue) 55%, var(--sky-blue) 100%);
+            overflow: hidden;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .bank {
+            position: absolute;
+            bottom: 0;
+            width: 35%;
+            height: 45%;
+            background-color: var(--bank-green);
+            border-top: 5px solid #a67c52;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 1rem;
+            padding: 1rem;
+            box-sizing: border-box;
+            z-index: 5;
+        }
+        #bank-left { left: 0; }
+        #bank-right { right: 0; }
+
+        .person {
+            width: 50px;
+            height: 80px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        .person:hover { transform: translateY(-5px); }
+        .person.disabled { cursor: not-allowed; filter: grayscale(80%); }
+
+        /* --- Personnages en CSS --- */
+        .head {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            position: absolute;
+            top: 0;
+            left: 10px;
+            background-color: #ffdbac;
+        }
+        .body {
+            width: 40px;
+            height: 50px;
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+            border-radius: 10px 10px 0 0;
+        }
+        .missionary .body { background-color: #283618; } /* Vert foncé */
+        .cannibal .body { background-color: #bc4749; } /* Rouge */
+        .cannibal .head::after { /* Lance */
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 40px;
+            background: #a67c52;
+            transform: rotate(20deg);
+            right: -10px;
+            top: -10px;
+        }
+
+        #boat {
+            position: absolute;
+            width: clamp(180px, 20vw, 220px);
+            height: 70px;
+            bottom: 20%;
+            transform: translateX(-50%);
+            transition: left 2.5s cubic-bezier(0.45, 0, 0.55, 1);
+            z-index: 10;
+        }
+        .boat-hull { width: 100%; height: 50px; background: #606c38; border: 4px solid #283618; border-radius: 0 0 60px 60px; position: absolute; bottom: 0; box-sizing: border-box; }
+        #boat-content {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 1rem;
+        }
+
+        .controls { text-align: center; margin-top: 1.5rem; }
+        .button { font-family: var(--font-family); font-size: 1.2rem; padding: 0.75rem 1.5rem; border: none; background-color: var(--button-color); color: white; border-radius: 0.5rem; cursor: pointer; transition: background-color 0.3s, transform 0.2s; margin: 0.5rem; }
+        .button:hover { background-color: var(--button-hover); transform: translateY(-2px); }
+        .button:disabled { background-color: #a0aec0; cursor: not-allowed; transform: none; }
+        #message-box { margin-top: 1rem; height: 5rem; font-size: 1.2rem; font-weight: bold; text-align: center; transition: color 0.5s; padding: 0 1rem; }
+        .win-message { color: #2f855a; }
+        .loss-message { color: #c53030; }
+
+        @keyframes eaten-anim { 0% {transform: scale(1);} 50% {transform: scale(1.2) rotate(10deg);} 100% {transform: scale(0);} }
+        .eaten { animation: eaten-anim 0.5s forwards; }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <header>
+            <h1>Missionnaires et Cannibales</h1>
+            <p>Faites traverser tout le monde, mais ne laissez jamais les cannibales être plus nombreux que les missionnaires sur une rive !</p>
+        </header>
+
+        <div class="game-world">
+            <div id="bank-left" class="bank"></div>
+            <div id="boat">
+                <div class="boat-hull"></div>
+                <div id="boat-content"></div>
+            </div>
+            <div id="bank-right" class="bank"></div>
+        </div>
+
+        <div class="controls">
+            <a href="../index.html" class="button" style="background-color: #4a5568;">Accueil</a>
+            <button id="cross-button" class="button">Traverser</button>
+            <button id="reset-button" class="button" style="background-color: #c53030;">Recommencer</button>
+            <div id="message-box"></div>
+        </div>
+        
+        <footer style="text-align:center; margin-top: 2rem; color: #718096;">Créé par Chrice</footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bankLeft = document.getElementById('bank-left');
+            const bankRight = document.getElementById('bank-right');
+            const boatContent = document.getElementById('boat-content');
+            const boatElement = document.getElementById('boat');
+            const crossButton = document.getElementById('cross-button');
+            const resetButton = document.getElementById('reset-button');
+            const messageBox = document.getElementById('message-box');
+
+            let state = {};
+
+            function createPerson(id, type) {
+                const person = document.createElement('div');
+                person.id = id;
+                person.className = `person ${type}`;
+                person.innerHTML = `<div class="head"></div><div class="body"></div>`;
+                person.addEventListener('click', onPersonClick);
+                return person;
+            }
+
+            function initializeGame() {
+                state = {
+                    locations: {
+                        m1: 'left', m2: 'left', m3: 'left',
+                        c1: 'left', c2: 'left', c3: 'left',
+                    },
+                    boat: 'left',
+                    isMoving: false,
+                    isGameOver: false
+                };
+                
+                messageBox.innerHTML = '';
+                messageBox.className = '';
+                crossButton.disabled = false;
+
+                bankLeft.innerHTML = '';
+                bankRight.innerHTML = '';
+                boatContent.innerHTML = '';
+
+                Object.keys(state.locations).forEach(id => {
+                    const type = id.startsWith('m') ? 'missionary' : 'cannibal';
+                    bankLeft.appendChild(createPerson(id, type));
+                });
+                updateScene();
+            }
+
+            function updateScene() {
+                boatElement.style.left = state.boat === 'left' ? '42%' : '58%';
+                
+                document.querySelectorAll('.person').forEach(person => {
+                    const id = person.id;
+                    const location = state.locations[id];
+                    
+                    if (location === 'boat') {
+                        if (person.parentElement !== boatContent) boatContent.appendChild(person);
+                    } else if (location === 'left') {
+                        if (person.parentElement !== bankLeft) bankLeft.appendChild(person);
+                    } else {
+                        if (person.parentElement !== bankRight) bankRight.appendChild(person);
+                    }
+                    person.classList.toggle('disabled', location !== state.boat && location !== 'boat');
+                });
+            }
+
+            function onPersonClick(event) {
+                if (state.isMoving || state.isGameOver) return;
+                const person = event.currentTarget;
+                const id = person.id;
+                const location = state.locations[id];
+
+                if (location === state.boat) {
+                    if (boatContent.children.length < 2) {
+                        state.locations[id] = 'boat';
+                    }
+                } else if (location === 'boat') {
+                    state.locations[id] = state.boat;
+                }
+                updateScene();
+            }
+
+            function crossRiver() {
+                if (state.isMoving || state.isGameOver || boatContent.children.length === 0) return;
+                state.isMoving = true;
+                crossButton.disabled = true;
+                
+                state.boat = (state.boat === 'left') ? 'right' : 'left';
+                updateScene();
+
+                setTimeout(() => {
+                    state.isMoving = false;
+                    checkGameStatus();
+                    if (!state.isGameOver) {
+                        crossButton.disabled = false;
+                    }
+                }, 2500);
+            }
+
+            function checkGameStatus() {
+                const countOnBank = (bank, type) => {
+                    return Object.keys(state.locations).filter(id => 
+                        id.startsWith(type) && state.locations[id] === bank
+                    ).length;
+                };
+
+                const checkBank = (bank) => {
+                    const missionaries = countOnBank(bank, 'm');
+                    const cannibals = countOnBank(bank, 'c');
+                    if (missionaries > 0 && cannibals > missionaries) {
+                        endGame(false, bank);
+                        return true;
+                    }
+                    return false;
+                };
+
+                if (checkBank('left') || checkBank('right')) return;
+
+                const missionariesOnRight = countOnBank('right', 'm');
+                const cannibalsOnRight = countOnBank('right', 'c');
+                if (missionariesOnRight === 3 && cannibalsOnRight === 3) {
+                    endGame(true);
+                }
+            }
+
+            function endGame(isWin, losingBank = null) {
+                state.isGameOver = true;
+                crossButton.disabled = true;
+                if (isWin) {
+                    messageBox.innerHTML = "<strong>Bravo !</strong><br>Tout le monde a traversé en toute sécurité.";
+                    messageBox.className = 'win-message';
+                } else {
+                    messageBox.innerHTML = `<strong>Oh non !</strong><br>Les missionnaires sur la rive ${losingBank === 'left' ? 'gauche' : 'droite'} se sont fait manger !`;
+                    messageBox.className = 'loss-message';
+                    const bank = losingBank === 'left' ? bankLeft : bankRight;
+                    bank.querySelectorAll('.missionary').forEach(m => m.classList.add('eaten'));
+                }
+            }
+
+            crossButton.addEventListener('click', crossRiver);
+            resetButton.addEventListener('click', initializeGame);
+            initializeGame();
+        });
+    </script>
+</body>
+</html>
