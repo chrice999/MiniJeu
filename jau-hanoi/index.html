@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu : Les Tours de Hanoï</title>
+    <style>
+        body { font-family: 'Georgia', serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: #f5f5dc; color: #3a3a3a; }
+        .game-container { text-align: center; }
+        .towers { display: flex; justify-content: center; align-items: flex-end; height: 250px; margin: 2rem 0; }
+        .tower { width: 15px; height: 220px; background-color: #8B4513; margin: 0 50px; display: flex; flex-direction: column-reverse; align-items: center; padding-bottom: 5px; border-radius: 5px 5px 0 0; position: relative; }
+        .tower::after { content: ''; position: absolute; bottom: -10px; left: -42.5px; width: 100px; height: 15px; background: #a0522d; border-radius: 5px; }
+        .disk { height: 30px; border-radius: 15px; cursor: pointer; transition: background-color 0.2s; border: 2px solid rgba(0,0,0,0.2); }
+        .disk:hover { filter: brightness(1.1); }
+        .selected { box-shadow: 0 0 15px 5px gold; }
+        .disk1 { width: 60px; background-color: #ff6b6b; }
+        .disk2 { width: 90px; background-color: #f0e68c; }
+        .disk3 { width: 120px; background-color: #87ceeb; }
+        .disk4 { width: 150px; background-color: #90ee90; }
+        .disk5 { width: 180px; background-color: #ffa07a; }
+        .controls button, .controls select { font-size: 1rem; padding: 0.5rem 1rem; margin: 0.5rem; border-radius: 5px; border: 1px solid #ccc; cursor: pointer; }
+        #message-box { margin-top: 1rem; height: 2rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Les Tours de Hanoï</h1>
+        <p>Déplacez tous les disques sur la tour de droite.</p>
+        <div class="controls">
+            <label for="disk-count">Nombre de disques:</label>
+            <select id="disk-count">
+                <option value="3">3</option>
+                <option value="4" selected>4</option>
+                <option value="5">5</option>
+            </select>
+            <button id="reset-button">Recommencer</button>
+            <a href="../index.html" class="button" style="text-decoration: none; background-color: #4a5568; color: white;">Accueil</a>
+        </div>
+        <div class="towers">
+            <div class="tower" id="tower-1" data-tower="1"></div>
+            <div class="tower" id="tower-2" data-tower="2"></div>
+            <div class="tower" id="tower-3" data-tower="3"></div>
+        </div>
+        <div id="message-box"></div>
+        <p>Mouvements: <span id="move-count">0</span></p>
+        <footer style="margin-top: 2rem; color: #718096;">Créé par Chrice</footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const towers = document.querySelectorAll('.tower');
+            const resetButton = document.getElementById('reset-button');
+            const diskCountSelect = document.getElementById('disk-count');
+            const moveCountSpan = document.getElementById('move-count');
+            const messageBox = document.getElementById('message-box');
+
+            let selectedDisk = null;
+            let moveCount = 0;
+            let diskCount = 4;
+
+            function createDisks() {
+                const tower1 = document.getElementById('tower-1');
+                tower1.innerHTML = '';
+                for (let i = diskCount; i > 0; i--) {
+                    const disk = document.createElement('div');
+                    disk.className = `disk disk${i}`;
+                    disk.dataset.size = i;
+                    tower1.appendChild(disk);
+                }
+            }
+
+            function resetGame() {
+                diskCount = parseInt(diskCountSelect.value);
+                selectedDisk = null;
+                moveCount = 0;
+                moveCountSpan.textContent = moveCount;
+                messageBox.textContent = '';
+                towers.forEach(tower => tower.innerHTML = '');
+                createDisks();
+            }
+
+            function handleTowerClick(e) {
+                const tower = e.currentTarget;
+                if (selectedDisk) {
+                    // Tenter de poser le disque
+                    const topDisk = tower.children[tower.children.length - 1];
+                    if (!topDisk || parseInt(selectedDisk.dataset.size) < parseInt(topDisk.dataset.size)) {
+                        tower.appendChild(selectedDisk);
+                        selectedDisk.classList.remove('selected');
+                        selectedDisk = null;
+                        moveCount++;
+                        moveCountSpan.textContent = moveCount;
+                        checkWin();
+                    } else {
+                        // Mouvement invalide
+                        messageBox.textContent = "Mouvement invalide ! Un disque plus grand ne peut pas aller sur un plus petit.";
+                        setTimeout(() => messageBox.textContent = '', 2000);
+                    }
+                } else {
+                    // Tenter de prendre un disque
+                    if (tower.children.length > 0) {
+                        selectedDisk = tower.children[tower.children.length - 1];
+                        selectedDisk.classList.add('selected');
+                    }
+                }
+            }
+            
+            function checkWin() {
+                const tower3 = document.getElementById('tower-3');
+                if (tower3.children.length === diskCount) {
+                    messageBox.textContent = `Bravo ! Vous avez réussi en ${moveCount} mouvements.`;
+                }
+            }
+
+            towers.forEach(tower => tower.addEventListener('click', handleTowerClick));
+            resetButton.addEventListener('click', resetGame);
+            diskCountSelect.addEventListener('change', resetGame);
+
+            resetGame();
+        });
+    </script>
+</body>
+</html>
