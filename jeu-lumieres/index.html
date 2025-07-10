@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu : Le Jeu des Lumières</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #2c3e50; color: white; }
+        .game-container { text-align: center; }
+        #lights-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px auto; padding: 10px; background-color: #34495e; border-radius: 5px; }
+        .light { width: 60px; height: 60px; border-radius: 50%; cursor: pointer; transition: background-color 0.2s, box-shadow 0.2s; }
+        .light.on { background-color: #f1c40f; box-shadow: 0 0 20px #f1c40f; }
+        .light.off { background-color: #7f8c8d; }
+        .controls button, .controls a { font-size: 1rem; padding: 0.5rem 1rem; margin: 0.5rem; border-radius: 5px; border: 1px solid #ccc; cursor: pointer; }
+        #message-box { height: 2rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Le Jeu des Lumières</h1>
+        <p>Éteignez toutes les lumières pour gagner.</p>
+        <div id="lights-grid"></div>
+        <div id="message-box"></div>
+        <div class="controls">
+            <button id="reset-button" class="button">Recommencer</button>
+            <a href="../index.html" class="button" style="text-decoration: none; background-color: #4a5568; color: white;">Accueil</a>
+        </div>
+        <footer style="margin-top: 2rem; color: #bdc3c7;">Créé par Chrice</footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gridElement = document.getElementById('lights-grid');
+            const resetButton = document.getElementById('reset-button');
+            const messageBox = document.getElementById('message-box');
+            const size = 5;
+            let board = [];
+
+            function createGrid() {
+                gridElement.innerHTML = '';
+                for (let r = 0; r < size; r++) {
+                    board[r] = [];
+                    for (let c = 0; c < size; c++) {
+                        board[r][c] = false; // toutes éteintes au début
+                        const light = document.createElement('div');
+                        light.className = 'light off';
+                        light.dataset.row = r;
+                        light.dataset.col = c;
+                        light.addEventListener('click', () => onLightClick(r, c));
+                        gridElement.appendChild(light);
+                    }
+                }
+                // Appuyer un certain nombre de fois au hasard pour créer un puzzle solvable
+                const shuffles = Math.floor(Math.random() * 10) + 5;
+                for (let i = 0; i < shuffles; i++) {
+                    const r = Math.floor(Math.random() * size);
+                    const c = Math.floor(Math.random() * size);
+                    toggleLights(r, c);
+                }
+                render();
+            }
+
+            function render() {
+                let lightsOn = 0;
+                for (let r = 0; r < size; r++) {
+                    for (let c = 0; c < size; c++) {
+                        const light = gridElement.children[r * size + c];
+                        if (board[r][c]) {
+                            light.classList.add('on');
+                            light.classList.remove('off');
+                            lightsOn++;
+                        } else {
+                            light.classList.add('off');
+                            light.classList.remove('on');
+                        }
+                    }
+                }
+                if (lightsOn === 0) {
+                    messageBox.textContent = "Bravo, vous avez gagné !";
+                } else {
+                    messageBox.textContent = "";
+                }
+            }
+
+            function toggleLights(r, c) {
+                const positions = [[r, c], [r - 1, c], [r + 1, c], [r, c - 1], [r, c + 1]];
+                positions.forEach(([row, col]) => {
+                    if (row >= 0 && row < size && col >= 0 && col < size) {
+                        board[row][col] = !board[row][col];
+                    }
+                });
+            }
+
+            function onLightClick(r, c) {
+                toggleLights(r, c);
+                render();
+            }
+
+            resetButton.addEventListener('click', createGrid);
+            createGrid();
+        });
+    </script>
+</body>
+</html>
