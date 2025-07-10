@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu : Mastermind</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #e6e6e6; }
+        .game-container { background-color: #d2b48c; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
+        #game-board { display: flex; flex-direction: column-reverse; gap: 10px; margin-bottom: 20px; }
+        .row { display: flex; gap: 10px; align-items: center; }
+        .guess-pegs, .key-pegs { display: flex; gap: 5px; }
+        .peg { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #555; background-color: #eee; }
+        .guess-peg { cursor: pointer; }
+        .key-peg { width: 15px; height: 15px; border-radius: 50%; background-color: #fff; border: 1px solid #555; }
+        .key-pegs { flex-wrap: wrap; width: 40px; }
+        #color-palette { display: flex; gap: 10px; margin-bottom: 20px; }
+        .color-btn { width: 40px; height: 40px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; }
+        .color-btn.selected { border-color: gold; transform: scale(1.1); }
+        .controls button, .controls a { font-size: 1rem; padding: 0.5rem 1rem; margin: 0.5rem; border-radius: 5px; border: 1px solid #ccc; cursor: pointer; }
+        #solution-row { display: flex; gap: 10px; padding: 10px; background: #0002; border-radius: 5px; margin-bottom: 10px; }
+        #solution-row .peg { filter: blur(5px); transition: filter 0.5s; }
+        #solution-row.revealed .peg { filter: blur(0); }
+    </style>
+</head>
+<body>
+    <h1>Mastermind</h1>
+    <div class="game-container">
+        <div id="solution-row"></div>
+        <div id="game-board"></div>
+        <div id="color-palette"></div>
+        <div class="controls">
+            <button id="check-button">Vérifier</button>
+            <button id="reset-button">Recommencer</button>
+            <a href="../index.html" class="button" style="text-decoration: none; background-color: #4a5568; color: white;">Accueil</a>
+        </div>
+        <div id="message-box"></div>
+        <footer style="text-align:center; margin-top: 2rem; color: #718096;">Créé par Chrice</footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const board = document.getElementById('game-board');
+            const palette = document.getElementById('color-palette');
+            const checkButton = document.getElementById('check-button');
+            const resetButton = document.getElementById('reset-button');
+            const solutionRow = document.getElementById('solution-row');
+            const messageBox = document.getElementById('message-box');
+
+            const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange'];
+            const codeLength = 4;
+            const maxGuesses = 10;
+
+            let solution = [];
+            let currentGuess = [];
+            let currentRowIndex = 0;
+            let selectedColor = colors[0];
+
+            function startGame() {
+                // Générer la solution
+                solution = [];
+                for (let i = 0; i < codeLength; i++) {
+                    solution.push(colors[Math.floor(Math.random() * colors.length)]);
+                }
+
+                // Réinitialiser l'UI
+                board.innerHTML = '';
+                palette.innerHTML = '';
+                solutionRow.innerHTML = '';
+                solutionRow.classList.remove('revealed');
+                messageBox.textContent = '';
+                currentRowIndex = 0;
+
+                // Afficher la solution (cachée)
+                for (let i = 0; i < codeLength; i++) {
+                    const peg = document.createElement('div');
+                    peg.className = 'peg';
+                    peg.style.backgroundColor = solution[i];
+                    solutionRow.appendChild(peg);
+                }
+
+                // Créer la palette
+                colors.forEach(color => {
+                    const btn = document.createElement('button');
+                    btn.className = 'color-btn';
+                    btn.style.backgroundColor = color;
+                    btn.addEventListener('click', () => {
+                        selectedColor = color;
+                        document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                    });
+                    palette.appendChild(btn);
+                });
+                palette.children[0].classList.add('selected');
+
+                // Créer les rangées de jeu
+                for (let i = 0; i < maxGuesses; i++) {
+                    createRow();
+                }
+                
+                activateCurrentRow();
+            }
+
+            function createRow() {
+                const row = document.createElement('div');
+                row.className = 'row';
+                const guessPegs = document.createElement('div');
+                guessPegs.className = 'guess-pegs';
+                for (let i = 0; i < codeLength; i++) {
+                    const peg = document.createElement('div');
+                    peg.className = 'peg guess-peg';
+                    peg.dataset.index = i;
+                    guessPegs.appendChild(peg);
+                }
+                const keyPegs = document.createElement('div');
+                keyPegs.className = 'key-pegs';
+                for (let i = 0; i < codeLength; i++) {
+                    const peg = document.createElement('div');
+                    peg.className = 'key-peg';
+                    keyPegs.appendChild(peg);
+                }
+                row.appendChild(guessPegs);
+                row.appendChild(keyPegs);
+                board.appendChild(row);
+            }
+            
+            function activateCurrentRow() {
+                if (currentRowIndex >= maxGuesses) return;
+                const row = board.children[currentRowIndex];
+                currentGuess = Array(codeLength).fill(null);
+                row.querySelectorAll('.guess-peg').forEach(peg => {
+                    peg.addEventListener('click', () => {
+                        peg.style.backgroundColor = selectedColor;
+                        currentGuess[peg.dataset.index] = selectedColor;
+                    });
+                });
+            }
+            
+            function checkGuess() {
+                if (currentGuess.includes(null)) {
+                    messageBox.textContent = "Veuillez remplir toutes les cases.";
+                    return;
+                }
+                
+                let blackPegs = 0;
+                let whitePegs = 0;
+                let solutionCheck = [...solution];
+                let guessCheck = [...currentGuess];
+
+                // Chercher les pions noirs (bonne couleur, bonne place)
+                for (let i = 0; i < codeLength; i++) {
+                    if (guessCheck[i] === solutionCheck[i]) {
+                        blackPegs++;
+                        solutionCheck[i] = null;
+                        guessCheck[i] = null;
+                    }
+                }
+
+                // Chercher les pions blancs (bonne couleur, mauvaise place)
+                for (let i = 0; i < codeLength; i++) {
+                    if (guessCheck[i] !== null) {
+                        const indexInSolution = solutionCheck.indexOf(guessCheck[i]);
+                        if (indexInSolution !== -1) {
+                            whitePegs++;
+                            solutionCheck[indexInSolution] = null;
+                        }
+                    }
+                }
+                
+                // Afficher le résultat
+                const row = board.children[currentRowIndex];
+                const keyPegs = row.querySelectorAll('.key-peg');
+                for (let i = 0; i < blackPegs; i++) keyPegs[i].style.backgroundColor = 'black';
+                for (let i = 0; i < whitePegs; i++) keyPegs[blackPegs + i].style.backgroundColor = 'grey';
+
+                // Gérer la fin du jeu ou le tour suivant
+                if (blackPegs === codeLength) {
+                    messageBox.textContent = "Bravo, vous avez trouvé le code !";
+                    solutionRow.classList.add('revealed');
+                } else {
+                    currentRowIndex++;
+                    if (currentRowIndex >= maxGuesses) {
+                        messageBox.textContent = "Perdu ! Le code était :";
+                        solutionRow.classList.add('revealed');
+                    } else {
+                        activateCurrentRow();
+                    }
+                }
+            }
+
+            checkButton.addEventListener('click', checkGuess);
+            resetButton.addEventListener('click', startGame);
+            startGame();
+        });
+    </script>
+</body>
+</html>
+
