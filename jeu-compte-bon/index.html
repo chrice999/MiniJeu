@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu : Le Compte est Bon</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f4f4f4; }
+        .game-container { text-align: center; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        #target-number { font-size: 3rem; font-weight: bold; color: #c0392b; margin: 1rem 0; }
+        #available-numbers { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; }
+        .number-tile { padding: 1rem; font-size: 1.5rem; background: #3498db; color: white; border-radius: 5px; }
+        #solution-input { width: 80%; max-width: 400px; padding: 0.5rem; font-size: 1.2rem; margin-bottom: 1rem; }
+        .controls button, .controls a { font-size: 1rem; padding: 0.5rem 1rem; margin: 0.5rem; border-radius: 5px; border: 1px solid #ccc; cursor: pointer; }
+        #message { height: 2rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Le Compte est Bon</h1>
+        <p>Trouvez le compte en utilisant les nombres et les opérations (+, -, *, /).</p>
+        <div id="target-number-container">
+            Cible: <span id="target-number"></span>
+        </div>
+        <div id="available-numbers"></div>
+        <input type="text" id="solution-input" placeholder="Votre calcul : (ex: 10 * 10 + 1)">
+        <div id="message"></div>
+        <div class="controls">
+            <button id="check-button" class="button">Vérifier</button>
+            <button id="new-game-button" class="button">Nouveau Tirage</button>
+            <a href="../index.html" class="button" style="text-decoration: none; background-color: #4a5568; color: white;">Accueil</a>
+        </div>
+        <footer style="margin-top: 2rem; color: #718096;">Créé par Chrice</footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const targetNumberSpan = document.getElementById('target-number');
+            const availableNumbersDiv = document.getElementById('available-numbers');
+            const solutionInput = document.getElementById('solution-input');
+            const checkButton = document.getElementById('check-button');
+            const newGameButton = document.getElementById('new-game-button');
+            const messageDiv = document.getElementById('message');
+
+            const smallNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            const bigNumbers = [25, 50, 75, 100];
+            let currentNumbers = [];
+
+            function newGame() {
+                currentNumbers = [];
+                const tempSmall = [...smallNumbers];
+                const tempBig = [...bigNumbers];
+
+                // Choisir 6 nombres
+                for (let i = 0; i < 6; i++) {
+                    // Pour simplifier, on prend 6 petits nombres
+                    const randomIndex = Math.floor(Math.random() * tempSmall.length);
+                    currentNumbers.push(tempSmall.splice(randomIndex, 1)[0]);
+                }
+
+                // Afficher les nombres
+                availableNumbersDiv.innerHTML = '';
+                currentNumbers.forEach(num => {
+                    const tile = document.createElement('div');
+                    tile.className = 'number-tile';
+                    tile.textContent = num;
+                    availableNumbersDiv.appendChild(tile);
+                });
+
+                // Générer le nombre cible
+                const target = Math.floor(Math.random() * 900) + 100;
+                targetNumberSpan.textContent = target;
+                
+                solutionInput.value = '';
+                messageDiv.textContent = '';
+            }
+
+            function checkSolution() {
+                const expression = solutionInput.value;
+                if (!expression) return;
+
+                // Sécurité : ne garder que les chiffres, les opérateurs et les parenthèses
+                const sanitizedExpression = expression.replace(/[^-()\d/*+.]/g, '');
+                
+                // Vérifier que seuls les nombres disponibles sont utilisés
+                const usedNumbers = sanitizedExpression.match(/\d+/g) || [];
+                const availableCopy = [...currentNumbers];
+                let numbersAreValid = true;
+                for (const numStr of usedNumbers) {
+                    const num = parseInt(numStr);
+                    const index = availableCopy.indexOf(num);
+                    if (index === -1) {
+                        numbersAreValid = false;
+                        break;
+                    }
+                    availableCopy.splice(index, 1);
+                }
+
+                if (!numbersAreValid) {
+                    messageDiv.textContent = "Vous ne pouvez utiliser que les nombres disponibles !";
+                    messageDiv.style.color = 'red';
+                    return;
+                }
+
+                try {
+                    // eslint-disable-next-line no-eval
+                    const result = eval(sanitizedExpression);
+                    if (result === parseInt(targetNumberSpan.textContent)) {
+                        messageDiv.textContent = `Bravo ! ${result} est bien le bon compte !`;
+                        messageDiv.style.color = 'green';
+                    } else {
+                        messageDiv.textContent = `Presque ! Votre calcul fait ${result}, pas ${targetNumberSpan.textContent}.`;
+                        messageDiv.style.color = 'orange';
+                    }
+                } catch (error) {
+                    messageDiv.textContent = "Erreur dans votre calcul. Veuillez vérifier la syntaxe.";
+                    messageDiv.style.color = 'red';
+                }
+            }
+
+            newGameButton.addEventListener('click', newGame);
+            checkButton.addEventListener('click', checkSolution);
+            newGame();
+        });
+    </script>
+</body>
+</html>
