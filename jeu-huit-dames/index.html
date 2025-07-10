@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu : Les Huit Dames</title>
+    <style>
+        body { font-family: 'Georgia', serif; display: flex; flex-direction: column; align-items: center; background-color: #eee; }
+        #chessboard { display: grid; grid-template-columns: repeat(8, 1fr); width: 480px; height: 480px; border: 5px solid #333; }
+        .square { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; user-select: none; }
+        .white { background-color: #f0d9b5; }
+        .black { background-color: #b58863; }
+        .queen { cursor: pointer; }
+        .threatened { background-color: rgba(255, 0, 0, 0.4) !important; }
+        .controls { margin: 1rem 0; }
+        .button { font-size: 1rem; padding: 0.5rem 1rem; margin: 0.5rem; border-radius: 5px; border: 1px solid #ccc; cursor: pointer; }
+        #message-box { height: 2rem; font-weight: bold; }
+        @media (max-width: 500px) {
+            #chessboard { width: 90vw; height: 90vw; }
+            .square { width: 11.25vw; height: 11.25vw; font-size: 8vw; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Les Huit Dames</h1>
+    <p>Placez 8 reines sur l'échiquier sans qu'aucune ne puisse en menacer une autre.</p>
+    <div id="chessboard"></div>
+    <div class="controls">
+        <p>Reines placées: <span id="queen-count">0</span> / 8</p>
+        <button id="reset-button" class="button">Recommencer</button>
+        <a href="../index.html" class="button" style="text-decoration: none; background-color: #4a5568; color: white;">Accueil</a>
+    </div>
+    <div id="message-box"></div>
+    <footer style="margin-top: 2rem; color: #718096;">Créé par Chrice</footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const boardElement = document.getElementById('chessboard');
+            const queenCountSpan = document.getElementById('queen-count');
+            const resetButton = document.getElementById('reset-button');
+            const messageBox = document.getElementById('message-box');
+            const size = 8;
+            let board = Array(size).fill().map(() => Array(size).fill(0)); // 0 = empty, 1 = queen
+
+            function createBoard() {
+                boardElement.innerHTML = '';
+                for (let r = 0; r < size; r++) {
+                    for (let c = 0; c < size; c++) {
+                        const square = document.createElement('div');
+                        square.className = `square ${(r + c) % 2 === 0 ? 'white' : 'black'}`;
+                        square.dataset.row = r;
+                        square.dataset.col = c;
+                        square.addEventListener('click', () => onSquareClick(r, c));
+                        boardElement.appendChild(square);
+                    }
+                }
+            }
+
+            function updateBoard() {
+                let queenCount = 0;
+                const threatenedSquares = new Set();
+
+                // Trouver les reines et marquer les cases menacées
+                for (let r = 0; r < size; r++) {
+                    for (let c = 0; c < size; c++) {
+                        if (board[r][c] === 1) {
+                            queenCount++;
+                            // Lignes et colonnes
+                            for (let i = 0; i < size; i++) {
+                                threatenedSquares.add(`${r}-${i}`);
+                                threatenedSquares.add(`${i}-${c}`);
+                            }
+                            // Diagonales
+                            for (let i = 1; i < size; i++) {
+                                if (r + i < size && c + i < size) threatenedSquares.add(`${r+i}-${c+i}`);
+                                if (r - i >= 0 && c - i >= 0) threatenedSquares.add(`${r-i}-${c-i}`);
+                                if (r + i < size && c - i >= 0) threatenedSquares.add(`${r+i}-${c-i}`);
+                                if (r - i >= 0 && c + i < size) threatenedSquares.add(`${r-i}-${c+i}`);
+                            }
+                        }
+                    }
+                }
+
+                // Mettre à jour l'affichage
+                for (let r = 0; r < size; r++) {
+                    for (let c = 0; c < size; c++) {
+                        const square = boardElement.children[r * size + c];
+                        square.innerHTML = '';
+                        square.classList.remove('threatened');
+                        if (board[r][c] === 1) {
+                            square.innerHTML = '<span class="queen">♛</span>';
+                        }
+                        if (threatenedSquares.has(`${r}-${c}`)) {
+                            square.classList.add('threatened');
+                        }
+                    }
+                }
+                queenCountSpan.textContent = queenCount;
+                
+                if (queenCount === 8) {
+                    messageBox.textContent = "Bravo, vous avez résolu l'énigme !";
+                    messageBox.style.color = 'green';
+                } else {
+                    messageBox.textContent = '';
+                }
+            }
+
+            function onSquareClick(r, c) {
+                // On ne peut pas placer une reine sur une case menacée par une autre
+                const square = boardElement.children[r * size + c];
+                if (board[r][c] === 0 && square.classList.contains('threatened')) {
+                    return;
+                }
+                
+                board[r][c] = board[r][c] === 1 ? 0 : 1;
+                updateBoard();
+            }
+
+            function resetGame() {
+                board = Array(size).fill().map(() => Array(size).fill(0));
+                updateBoard();
+            }
+
+            resetButton.addEventListener('click', resetGame);
+            createBoard();
+            updateBoard();
+        });
+    </script>
+</body>
+</html>
