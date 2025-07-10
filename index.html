@@ -10,13 +10,15 @@
         body {
             font-family: 'Lora', serif;
             background-image: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
-            background-color: #fdf6e3; /* Parchment color */
+            background-color: #fdf6e3; /* Couleur parchemin */
         }
         .font-title {
             font-family: 'Playfair Display', serif;
         }
         .game-card {
             transition: transform 0.3s, box-shadow 0.3s;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
         }
         .game-card:hover {
             transform: translateY(-10px);
@@ -27,31 +29,82 @@
 <body class="flex flex-col items-center justify-center min-h-screen p-6">
 
     <header class="text-center mb-12">
-        <h1 class="text-5xl md:text-7xl font-title text-amber-900">Les Énigmes de la Rivière</h1>
+        <h1 class="text-5xl md:text-7xl font-title text-amber-900">Les Énigmes de Chrice</h1>
         <p class="text-xl text-amber-800 mt-4">Testez votre logique avec ces casse-têtes intemporels.</p>
     </header>
 
-    <main class="grid md:grid-cols-2 gap-10 max-w-4xl w-full">
-        <!-- Carte du jeu 1 -->
-        <div class="game-card bg-white/70 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-gray-200">
+    <main class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl w-full">
+        <!-- Carte pour chaque jeu -->
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
             <h2 class="text-3xl font-title text-amber-900">Le Loup, la Chèvre et le Chou</h2>
-            <p class="mt-4 mb-6 text-gray-700">
-                Un classique de la traversée. Pouvez-vous transporter tout le monde de l'autre côté sans que personne ne se fasse manger ?
-            </p>
-            <a href="./jeu-loup/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">
-                Jouer
-            </a>
+            <p class="mt-4 mb-6 text-gray-700">Le classique de la traversée. Serez-vous assez malin pour les guider sans drame ?</p>
+            <a href="./jeu-loup/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
         </div>
 
-        <!-- Carte du jeu 2 -->
-        <div class="game-card bg-white/70 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-gray-200">
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
             <h2 class="text-3xl font-title text-amber-900">Missionnaires et Cannibales</h2>
-            <p class="mt-4 mb-6 text-gray-700">
-                Trois missionnaires et trois cannibales doivent traverser. Attention, si les cannibales sont plus nombreux sur une rive, le drame est assuré !
-            </p>
-            <a href="./jeu-missionnaires/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">
-                Jouer
-            </a>
+            <p class="mt-4 mb-6 text-gray-700">Attention à ne jamais laisser les cannibales en supériorité numérique sur une rive !</p>
+            <a href="./jeu-missionnaires/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Les Tours de Hanoï</h2>
+            <p class="mt-4 mb-6 text-gray-700">Déplacez les disques d'une tour à l'autre, mais un grand ne va jamais sur un petit.</p>
+            <a href="./jeu-hanoi/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Le Carré Magique</h2>
+            <p class="mt-4 mb-6 text-gray-700">Placez les chiffres de 1 à 9 pour que chaque ligne, colonne et diagonale ait la même somme.</p>
+            <a href="./jeu-carre-magique/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Démineur</h2>
+            <p class="mt-4 mb-6 text-gray-700">Un classique de la déduction. Trouvez toutes les cases vides sans faire exploser les mines.</p>
+            <a href="./jeu-demineur/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Jeu du Taquin</h2>
+            <p class="mt-4 mb-6 text-gray-700">Faites glisser les tuiles pour reconstituer l'image ou remettre les nombres en ordre.</p>
+            <a href="./jeu-taquin/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Mastermind</h2>
+            <p class="mt-4 mb-6 text-gray-700">Trouvez la combinaison de couleurs secrète en utilisant la logique et la déduction.</p>
+            <a href="./jeu-mastermind/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Les Huit Dames</h2>
+            <p class="mt-4 mb-6 text-gray-700">Placez huit reines sur un échiquier sans qu'aucune ne puisse en menacer une autre.</p>
+            <a href="./jeu-huit-dames/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Le Compte est Bon</h2>
+            <p class="mt-4 mb-6 text-gray-700">Utilisez les nombres donnés et les opérations pour atteindre le nombre cible.</p>
+            <a href="./jeu-compte-bon/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Le Jeu des Lumières</h2>
+            <p class="mt-4 mb-6 text-gray-700">Éteignez toutes les lumières. Mais attention, chaque clic inverse aussi les voisines !</p>
+            <a href="./jeu-lumieres/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Le Pont (Hashi)</h2>
+            <p class="mt-4 mb-6 text-gray-700">Connectez les îles avec le bon nombre de ponts, sans jamais les croiser.</p>
+            <a href="./jeu-pont/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
+        </div>
+
+        <div class="game-card p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">L'Énigme d'Einstein</h2>
+            <p class="mt-4 mb-6 text-gray-700">Un pur défi de déduction. Lisez les indices et résolvez le mystère : qui possède le zèbre ?</p>
+            <a href="./jeu-einstein/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">Jouer</a>
         </div>
     </main>
 
@@ -61,4 +114,3 @@
 
 </body>
 </html>
-
