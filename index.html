@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portail de Jeux de Logique</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lora', serif;
+            background-image: url('https://www.transparenttextures.com/patterns/light-paper-fibers.png');
+            background-color: #fdf6e3; /* Parchment color */
+        }
+        .font-title {
+            font-family: 'Playfair Display', serif;
+        }
+        .game-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-6">
+
+    <header class="text-center mb-12">
+        <h1 class="text-5xl md:text-7xl font-title text-amber-900">Les Énigmes de la Rivière</h1>
+        <p class="text-xl text-amber-800 mt-4">Testez votre logique avec ces casse-têtes intemporels.</p>
+    </header>
+
+    <main class="grid md:grid-cols-2 gap-10 max-w-4xl w-full">
+        <!-- Carte du jeu 1 -->
+        <div class="game-card bg-white/70 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Le Loup, la Chèvre et le Chou</h2>
+            <p class="mt-4 mb-6 text-gray-700">
+                Un classique de la traversée. Pouvez-vous transporter tout le monde de l'autre côté sans que personne ne se fasse manger ?
+            </p>
+            <a href="./jeu-loup/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">
+                Jouer
+            </a>
+        </div>
+
+        <!-- Carte du jeu 2 -->
+        <div class="game-card bg-white/70 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-gray-200">
+            <h2 class="text-3xl font-title text-amber-900">Missionnaires et Cannibales</h2>
+            <p class="mt-4 mb-6 text-gray-700">
+                Trois missionnaires et trois cannibales doivent traverser. Attention, si les cannibales sont plus nombreux sur une rive, le drame est assuré !
+            </p>
+            <a href="./jeu-missionnaires/index.html" class="inline-block bg-amber-800 text-white font-bold py-3 px-6 rounded-lg hover:bg-amber-900 transition-colors">
+                Jouer
+            </a>
+        </div>
+    </main>
+
+    <footer class="mt-12 text-center text-amber-800/70">
+        <p>Créé par Chrice</p>
+    </footer>
+
+</body>
+</html>
+
