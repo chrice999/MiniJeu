@@ -5,17 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jeu : L'Énigme d'Einstein</title>
     <style>
-        body { font-family: 'Georgia', serif; display: flex; flex-direction: column; align-items: center; background-color: #fdf6e3; }
-        .container { display: flex; flex-wrap: wrap; max-width: 1200px; }
-        .clues { width: 100%; md:width: 40%; padding: 1rem; }
-        .grid-area { width: 100%; md:width: 60%; padding: 1rem; }
-        #deduction-grid { border-collapse: collapse; }
-        #deduction-grid th, #deduction-grid td { border: 1px solid #ccc; padding: 0.5rem; text-align: center; }
-        #deduction-grid th { background-color: #eee; }
-        .category-header { writing-mode: vertical-rl; text-orientation: mixed; }
-        .grid-cell { width: 80px; height: 40px; }
-        .grid-cell select { width: 100%; border: none; }
-        .controls button, .controls a { font-size: 1rem; padding: 0.5rem 1rem; margin: 0.5rem; border-radius: 5px; border: 1px solid #ccc; cursor: pointer; }
+        body {
+            font-family: 'Georgia', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fdf6e3;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            flex-direction: column; /* Par défaut, les éléments sont empilés verticalement */
+            width: 100%;
+            max-width: 1200px;
+        }
+        .clues, .grid-area {
+            width: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        .clues ol {
+            padding-left: 20px;
+        }
+        .grid-area {
+            overflow-x: auto; /* Permet de faire défiler la grille horizontalement sur mobile */
+        }
+        #deduction-grid {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        #deduction-grid th, #deduction-grid td {
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            text-align: center;
+            min-width: 90px; /* Assure une largeur minimale pour la lisibilité */
+        }
+        #deduction-grid th {
+            background-color: #eee;
+        }
+        .grid-cell select {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 0.9rem;
+            font-family: 'Georgia', serif;
+        }
+        .controls {
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .controls button, .controls a {
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background-color: white;
+        }
+        
+        /* Pour les écrans plus larges (tablettes et ordinateurs) */
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row; /* Côte à côte sur les grands écrans */
+                align-items: flex-start;
+            }
+            .clues {
+                width: 40%;
+            }
+            .grid-area {
+                width: 60%;
+            }
+        }
     </style>
 </head>
 <body>
