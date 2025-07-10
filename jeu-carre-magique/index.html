@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu : Le Carré Magique</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: #fafafa; }
+        .game-container { text-align: center; }
+        #magic-square { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px auto; width: 300px; height: 300px; }
+        .cell { width: 100%; height: 100%; border: 2px solid #ccc; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
+        .cell input { width: 100%; height: 100%; text-align: center; font-size: 2.5rem; border: none; border-radius: 8px; background-color: #f0f0f0; }
+        .cell input:focus { outline: 2px solid #3498db; }
+        #message { margin-top: 20px; font-size: 1.5rem; font-weight: bold; height: 2rem; }
+        .button { font-size: 1rem; padding: 0.5rem 1rem; margin: 0.5rem; border-radius: 5px; border: 1px solid #ccc; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Le Carré Magique</h1>
+        <p>Placez les nombres de 1 à 9 pour que la somme de chaque ligne, colonne et diagonale soit 15.</p>
+        <div id="magic-square"></div>
+        <div id="message"></div>
+        <button id="check-button" class="button">Vérifier</button>
+        <button id="reset-button" class="button">Recommencer</button>
+        <a href="../index.html" class="button" style="text-decoration: none; background-color: #4a5568; color: white;">Accueil</a>
+        <footer style="margin-top: 2rem; color: #718096;">Créé par Chrice</footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const squareContainer = document.getElementById('magic-square');
+            const checkButton = document.getElementById('check-button');
+            const resetButton = document.getElementById('reset-button');
+            const messageDiv = document.getElementById('message');
+            const size = 3;
+            const magicSum = 15;
+            let cells = [];
+
+            function createSquare() {
+                squareContainer.innerHTML = '';
+                cells = [];
+                for (let i = 0; i < size * size; i++) {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'cell';
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.min = 1;
+                    input.max = 9;
+                    cellDiv.appendChild(input);
+                    squareContainer.appendChild(cellDiv);
+                    cells.push(input);
+                }
+            }
+
+            function checkSolution() {
+                const values = cells.map(input => parseInt(input.value) || 0);
+                const usedNumbers = new Set(values.filter(v => v >= 1 && v <= 9));
+                if (usedNumbers.size !== 9 || values.includes(0)) {
+                    messageDiv.textContent = "Veuillez utiliser chaque nombre de 1 à 9 une seule fois.";
+                    messageDiv.style.color = 'red';
+                    return;
+                }
+
+                const grid = [];
+                for (let i = 0; i < size; i++) {
+                    grid.push(values.slice(i * size, i * size + size));
+                }
+
+                // Check rows and columns
+                for (let i = 0; i < size; i++) {
+                    let rowSum = 0;
+                    let colSum = 0;
+                    for (let j = 0; j < size; j++) {
+                        rowSum += grid[i][j];
+                        colSum += grid[j][i];
+                    }
+                    if (rowSum !== magicSum || colSum !== magicSum) {
+                        messageDiv.textContent = "Incorrect. Essayez encore !";
+                        messageDiv.style.color = 'red';
+                        return;
+                    }
+                }
+                
+                // Check diagonals
+                let diag1Sum = 0;
+                let diag2Sum = 0;
+                for (let i = 0; i < size; i++) {
+                    diag1Sum += grid[i][i];
+                    diag2Sum += grid[i][size - 1 - i];
+                }
+
+                if (diag1Sum !== magicSum || diag2Sum !== magicSum) {
+                    messageDiv.textContent = "Incorrect. Essayez encore !";
+                    messageDiv.style.color = 'red';
+                    return;
+                }
+
+                messageDiv.textContent = "Bravo, c'est un carré magique !";
+                messageDiv.style.color = 'green';
+            }
+
+            checkButton.addEventListener('click', checkSolution);
+            resetButton.addEventListener('click', createSquare);
+            createSquare();
+        });
+    </script>
+</body>
+</html>
